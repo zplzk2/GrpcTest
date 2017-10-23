@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package Test.Common;
+
+service Broadcaster {
+  rpc Register (ListenerInfo) returns (stream Broadcast) {}
+}
+
+message ListenerInfo {
+  string name = 1;
+}
+
+message Broadcast {
+  string message = 1;
+}
