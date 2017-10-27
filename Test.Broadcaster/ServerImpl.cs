@@ -12,24 +12,21 @@ namespace Test.Broadcaster
     {
         public List<ListenerSkeleton> requests = new List<ListenerSkeleton>();
 
-        public override Task Register(ListenerInfo request, IServerStreamWriter<Broadcast> responseStream, ServerCallContext context)
+        public override async Task Register(ListenerInfo request, IServerStreamWriter<Broadcast> responseStream, ServerCallContext context)
         {
             Console.WriteLine($"Listener named \"{request.Name}\" registered.");
 
-            requests.Add(new ListenerSkeleton(request, responseStream));
+            ListenerSkeleton skeleton = new ListenerSkeleton(request, responseStream);
+            requests.Add(skeleton);
 
-            // TODO: I don't like this.
-            while (true)
-                Thread.Sleep(1000);
-
-            return null;
+            await skeleton.DoWork();
         }
 
         internal void SendAll(string msg)
         {
             foreach (var req in requests)
             {
-                req.responseStream.WriteAsync(new Broadcast { Message = $"Date:    {DateTime.Now.ToString()}\nTo:      all\nMessage: {msg}" });
+                req.Send(msg);
             }
         }
 
@@ -41,7 +38,7 @@ namespace Test.Broadcaster
             ListenerSkeleton req = requests.FirstOrDefault(r => r.listener.Name == to);
             if (req != null)
             {
-                req.responseStream.WriteAsync(new Broadcast { Message = $"Date:    {DateTime.Now.ToString()}\nTo:      {req.listener.Name}\nMessage: {msg}" });
+                req.Send(msg);
                 return true;
             }
             else
