@@ -1,0 +1,8 @@
+.vs/GrpcTest/v14/.suo
+packages/*
+Test.Broadcaster/bin/*
+Test.Broadcaster/obj/*
+Test.Common/bin/*
+Test.Common/obj/*
+Test.Listener/bin/*
+Test.Listener/obj/*
